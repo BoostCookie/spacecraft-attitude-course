@@ -23,6 +23,7 @@
 #let tl(tl, content) = $attach(content, tl: tl)$
 #let tln(content) = $attach(content, tl: "N")$
 #let tlb(content) = $attach(content, tl: "B")$
+#let tlp(content) = $attach(content, tl: "P")$
 #let bn = $bold(n)$
 #let bv = $bold(v)$
 #let bb = $bold(b)$
@@ -298,3 +299,72 @@ Composing Inertias
   2. Add inertias
   3. Add point-mass terms about new centre of mass
   This is called the "Parallel Axis Theorem"
+
+= Rigid Body Dynamics & Stability
+== Euler's Equation
+$ tln(h) = tln(J)tln(omega) = "const" $
+or with torques we have
+$ tln(dot(h)) = tln(tau) = tln(J) tln(dot(omega)) + underbrace(tln(dot(J)), "messy") tln(omega). $
+From last time we have
+$ tln(x) = Q tlb(x) ==> tln(dot(x)) = Q tlb(dot(x)) + dot(Q) tlb(x) = Q tlb(dot(x)) + Q hat(omega) tlb(x) = Q(tlb(dot(x)) + tlb(omega) times tlb(x)) $
+Therefore we can write
+$ ==> tln(dot(h)) = tln(tau) = Q(tlb(dot(h) + tlb(omega) times tlb(h))) \
+  ==> tlb(tau) = tlb(dot(h)) + tlb(omega) times tlb(h) \
+  ==> #box(stroke: black, inset: 5pt, baseline: 5pt, $J tlb(dot(omega)) + tlb(omega) times J tlb(omega) = tlb(tau)$) $
+This is called Euler's Equation.
+In principle axes we can write
+$ tlp(J_11) tlp(dot(omega)) + (tlp(J_33) - tlp(J_22)) tlp(omega_2) tlp(omega_3) = tlp(tau_1) \
+  J_22 dot(omega_2) + (J_11 - J_33) omega_1 omega_3 + tau_2
+  J_33 dot(omega)_3 + (J_22 - J_11) omega_1 omega_2 = tau_3 $
+Generally the axes are ordered such that $J_11 <= J_22 <= J_33$. \
+== How many equlibria does a spinning body have?
+We can rewrite in terms of $h$
+$ J dot(omega) + omega times J omega = 0 \
+==> dot(h) + (J^(-1) h) times h = 0 \
+==> dot(h) = h times J^(-1) h. $
+Equilibrium means that $h times J^(-1) h = 0$. \
+$==> h$ is an eigenvector of $J$ \
+$==> h$ is parallel to a principle axis \
+$==> h$ is an eigenvector of $J$ \
+$==>$ 6 equilibria $plus.minus p_1, plus.minus p_2, plus.minus p_3$ \
+A spin around the intermediate axis causes a "flip".
+== Which Equilibria are Stable?
+First we linearise about each principle axis. Assume $J_11 < J_22 < J_33$.
+$ omega_1 = omega_0 >> omega_2, omega_3 \
+  dot(omega_2) = underbrace(omega_0 (J_33 - J_22)/ J_22, alpha_1) omega_3, #h(1cm) dot(omega_3) = underbrace(omega_0 (J_11 - J_22) / J_33, alpha_2) omega_2 \
+  dif / (dif t) vec(omega_2, omega_3) = underbrace(mat(0, alpha_1; alpha_2, 0), A) vec(omega_2, omega_3)
+$
+For a $2 times 2$ matrix, eigenvalues are
+$ lambda^2 - lambda "Tr"(A) + det(A) = 0 ==> lambda^2 = - det(A) \
+==> lambda = plus.minus sqrt(alpha_1 alpha_2) ==> "pure imaginary"
+$
+$==>$ #box(stroke: black, inset: 4pt, baseline: 4pt, [marginally stable (oscillatory)]) \
+Oscillatory motion is called "nutation" \
+Next we look at the case
+$ omega_2 = omega_0 >> omega_1, omega_3 \
+alpha_1 = omega_0 (J_22 - J_33) / J_11 \
+alpha_2 = omega_0 (J_11 - J_22) / J_33 \
+lambda = plus.minus sqrt(alpha_1 alpha_2) $
+Here $alpha_1, alpha_2 < 0$ and therefore $lambda$ is real and positive. \
+#box(stroke: black, inset: 4pt, baseline: 4pt)[In the absence of energy dissipation, the major and minor axes are stable, while the intermediate axis is unstable.]
+== Solutions & Momentum Sphere
+- There is an analytic solution to Euler's equation but it is ugly and not very useful.
+- Usually we use e.g. Runge-Kutta
+- A lot of insight can be gained from looking at qualitative behaviour \
+  $norm(h) = "const" ==>$ solutions live on the "momentum sphere" \
+  $ T = 1/2 omega^tr J omega = 1/2 h^tr J^(-1) h = "const" ==>$ solutions live on the "energy ellipsoid" \
+  $==>$ Trajectories are intersections of these shapes
+
+== Energy Dissipation
+The maximum and minimum energy for a given momentum are
+  $ norm(h) = "const", #h(1cm) T = 1/2 omega^tr J omega = h^tr J^(-1) h \
+    ==> T_max = 1/2 1 / J_11 norm(h)^2, #h(1cm) T_min = 1/2 1 / J_33 norm(h)^2. $
+#box(stroke: black, inset: 4pt, baseline: 4pt)[$==>$ If there is energy dissipation, only the major axis is stable since it is the minimum-energy state.]
+
+== Where does energy dissipation come from?
+- Fluid slash
+- Damping in structural modes
+- Magnetic eddy current interactions
+
+
+
