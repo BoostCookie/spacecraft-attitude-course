@@ -1,0 +1,41 @@
+name: typst-compile
+
+on:
+  push:
+    paths:
+      - ".github/workflows/typst-compile.yml"
+      - "lecture notes/lecture.notes.typ"
+  pull_request:
+    paths:
+      - ".github/workflows/typst-compile.yml"
+      - "lecture notes/lecture.notes.typ"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/typst/typst:v0.13.1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Cache Typst files
+        uses: actions/cache@v5
+        with:
+          path: .typst-cache
+          key: typst-cache
+          restore-keys: |
+            typst-cache
+
+      - name: Compile Typst document
+        run: |
+          XDG_CACHE_HOME="$PWD/.typst-cache" typst compile "lecture notes/lecture.notes.typ"
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lecture-notes-pdf
+          path: "lecture notes/lecture.notes.pdf"
+          retention-days: 7
