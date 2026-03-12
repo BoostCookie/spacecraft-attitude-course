@@ -366,5 +366,83 @@ The maximum and minimum energy for a given momentum are
 - Damping in structural modes
 - Magnetic eddy current interactions
 
+= Damping & Gyrostats
+== Kane Damper
+A spherical cavity inside the spacecraft. Inside the cavity is a solid ball. In-between is a viscous oil.
+The torque on the body is then
+$ tlb(tau)_d = C_d (tlb(omega_d) - tlb(omega)) $
+where $C_d$ is a damping coefficient, $tlb(omega_d)$ is the angular velocity of the damper, and $tlb(omega)$ is the angular velocity of the spacecraft.
+The angular momentum of the damper in the inertial frame is
+$ tln(h)_d = tln(Q)^B tlb(h)_d ==> tln(dot(h))_d = - tln(tau)_d = dot(Q) tlb(h)_b + Q tlb(dot(h)_d) = q hat(omega) h_d + Q dot(h)_d \
+==> tlb(dot(h))_d + omega times tlb(h)_d = - tlb(tau)_d \
+==> J_d dot(omega)_d + omega times J_d omega_d = - tau_d \
+J dot(omega) + omega times J omega = tau_d = C_d (omega_d - omega). $
+Therefore our coupled ODEs for the joint dynamics of this system is
+$ J dot(omega) + omega times J omega = tau_d = C_d (omega_d - omega) \
+J_d dot(omega)_d + omega times J_d omega_d = -tau_d = c_d (omega - omega_d). $
+This is known as a Kane Damper. It only has two scalar parameters ($J_d$, the moment of inertia of the inner ball, and $C_d$, the damping coefficient).
+It can be easily fit to data.
 
+== Gyrostats
+- Definition: A system of rigid bodies whose relative motion does not change the total inertia of the system.
+- Example: A box (spacecraft bus) with spinning rotors (reaction wheels) inside.
+- Spacecraft pointing and spin can be chosen arbitrarily
 
+=== Gyrostat Dynamics
+- Modify Euler's equation to include rotors
+  $ underbrace(tlb(h), "total momentum") = underbrace(J tlb(omega), "body momentum") + underbrace(tlb(rho), "rotor momentum") $
+- Note: We will define these such that $J$ includes the rotor inertias. So $rho=0$ corresponds to the rotors being "locked" in the body frame.
+$ tln(dot(h)) = tln(tau) = Q ( tlb(dot(h)) + omega times tlb(h)) ==> tlb(tau) = tlb(dot(h)) + omega times tlb(h) \
+==> tlb(dot(h)) + omega times tlb(h) = #box(stroke: black, inset: 5pt, baseline: 5pt, $J tlb(dot(omega)) + tlb(dot(rho)) + tlb(omega) times (J tlb(omega) + tlb(rho)) = tlb(tau)$). $
+This is the gyrostat equation.
+
+=== Superspin
+What if we want to spin about a minor or intermediate axis?
+Assuming fixed wheel speeds ($dot(rho) = 0$), we revisit the spinning stability results.
+$ omega_2 = omega_0 >> omega_1, omega_3 \
+dot(omega)_1 = underbrace([omega_0 (J_22 - J_33) / J_11 + rho_2 / J_11], alpha_1) omega_3 \
+dot(omega)_3 = underbrace([omega_0 (J_11 - J_22) / J_33 + rho_2 / J_33], alpha_2) omega_1 $
+Recall that $lambda = plus.minus sqrt(alpha_1 alpha_2)$ needs to be imaginary.
+$==>$ We need
+$ omega_0 (J_11 - J_22) - rho_2 < 0 \
+omega_0 (J_22 - J_33) + rho_2 > 0. $
+Re-arranging slightly we get
+$ omega_0 (J_11 - (J_22 + rho_2 / omega_0)) < 0 \
+omega_0 ((J_22 + rho_2 / omega_0) - J_33) > 0. $
+We can think of $J_22 + rho_2 / omega_0$ as the "effective inertia".
+Given a desired $omega_2 = omega_0$, we can choose $rho_2$ such that
+$ (J_22 + rho_2 / omega_0) > J_33 $
+is the "effective major axis".
+A good engineering rule is $J_"eff" >= 1.2 J_33$.
+
+== Dynamic Balance
+What if I want to spin about a non-principle axis?
+The equilibrium spin condition is
+$ dot(omega) = dot(rho) = 0 \
+==> omega times (J omega + rho) = 0. $
+This is the "no-wobble condition".
+The solution is not unique (infinite solutions where $J omega + rho$ is parallel to $omega$).
+We additionally impose a superspin condition to get a unique stable solution.
+Only the component of $rho$ parallel to $omega$ contributes to $J_"eff"$.
+$ rho_s = rho dot omega / norm(omega) = rho dot omega / omega_s \
+==> rho^tr omega = rho_s omega_s \
+J_"eff" = J_s + rho_s / omega_s >= J_33 #h(0.5cm) (= 1.2 J_33) \
+tau_s = (omega / omega_s)^tr tau (omega / omega_s). $
+We stack the no-wobble and the superspin conditions
+$ underbrace(vec(omega^tr, hat(omega)), 4 times 3) rho = underbrace(vec(omega_s rho_s, - omega times J omega), 4 times 1) $
+
+*Least-Squares and Moore-Penrose Pseudo Inverse*
+For a "tall" linear system, we can find a "least-squares" solution by minimising the squared
+residual
+$ min_x 1/2 (A x - b)^tr (A x - b) \
+= min_x 1/2 x^tr A^tr A x - b^tr A x + "const". $
+We set the gradient to 0
+$ A^tr A x - A^tr b = 0 ==> x = underbrace((A^tr A)^(-1) A^tr, "pseudo inverse of" A) b. $
+Note that you should compute this with a QR factorisation.
+\
+We plug in this solution and get
+$ rho = (mat(omega, hat(omega)^tr) vec(omega^tr, hat(omega)))^(-1) mat(omega, hat(omega)^tr) vec(omega_s rho_s, -omega times J omega). $
+
+== Wobble vs Nutation
+- Nutation is an oscillatory motion that occurs in the off-axis components of $omega$ when perturbed in a principle-axis spin.
+- Wobble is due to difference between the true principle axis and the desired spin axis.
